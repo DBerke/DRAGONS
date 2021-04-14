@@ -283,9 +283,13 @@ class UnivariateSplineWithOutlierRemoval:
         elif np.any(w < 0):
             raise ValueError("Weights should not be negative")
         else:
-            wmin = w[w > 0].min()
-            wts = w / wmin
-            orig_mask |= (wts == 0)
+            orig_mask |= (w == 0)
+            try:
+                wmin = w[w > 0].min()
+            except ValueError:  # all w==0
+                wts = np.ones_like(x)
+            else:
+                wts = w / wmin
 
         if check_finite:
             if (not np.isfinite(x).all() or not np.isfinite(y).all() or
